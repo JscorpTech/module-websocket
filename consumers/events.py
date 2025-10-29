@@ -26,8 +26,14 @@ class EventsConsumer(AsyncWebsocketConsumer):
 
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        message = text_data_json["message"]
-        logging.info("Websocket yangi xabar data=%s user=%s", text_data, self.user.pk)
+        message = text_data_json.get("message")
+        if message is None:
+            message = "💀"
+        logging.info(
+            "Websocket yangi xabar data=%s user=%s",
+            text_data,
+            self.user.pk if self.user is not None else None,
+        )
         await self.channel_layer.group_send(
             "chat", {"type": "chat_message", "message": message}
         )
